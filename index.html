@@ -277,6 +277,21 @@
 
   const statusEl = document.getElementById('status');
 
+  // Load saved settings from localStorage if available
+  const savedVolume = localStorage.getItem('ocarina_volume');
+  const savedSpacing = localStorage.getItem('ocarina_spacing');
+
+  if (savedVolume !== null) {
+    volume = parseFloat(savedVolume);
+    document.getElementById('volume').value = volume * 100;
+  }
+
+  if (savedSpacing !== null) {
+    spacing = parseFloat(savedSpacing);
+    document.getElementById('spacing').value = spacing * 100;
+    document.getElementById('spacingVal').textContent = spacing.toFixed(2) + 's';
+  }
+
   function getCtx() {
     if (!audioCtx) {
       audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -343,13 +358,16 @@
     tuner.appendChild(b);
   });
 
-  // Controls
+  // Controls with automatic saving
   document.getElementById('volume').addEventListener('input', e => {
     volume = e.target.value / 100;
+    localStorage.setItem('ocarina_volume', volume);
   });
+
   document.getElementById('spacing').addEventListener('input', e => {
     spacing = e.target.value / 100;
     document.getElementById('spacingVal').textContent = spacing.toFixed(2) + 's';
+    localStorage.setItem('ocarina_spacing', spacing);
   });
 
   // Keyboard shortcuts 1-9
