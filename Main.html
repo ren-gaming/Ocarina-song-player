@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Ocarina Pitch Generator</title>
+  <style>
+    body { font-family: sans-serif; text-align: center; background: #121212; color: #fff; padding: 2rem; }
+    .grid { display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center; max-width: 600px; margin: 0 auto; }
+    button { padding: 1rem; font-size: 1.1rem; border: none; border-radius: 8px; background: #2e7d32; color: #fff; cursor: pointer; }
+    button:hover { background: #388e3c; }
+  </style>
+</head>
+<body>
+  <h1>Ocarina Song Generator</h1>
+  <p>Place your Switch 2 microphone near the speakers and press a song button.</p>
+  
+  <div class="grid">
+    <button onclick="playSong([440.00, 493.88, 587.33, 440.00, 493.88, 587.33])">Zelda's Lullaby</button>
+    <button onclick="playSong([293.66, 349.23, 493.88, 293.66, 349.23, 493.88])">Song of Time</button>
+    <button onclick="playSong([293.66, 349.23, 587.33, 293.66, 349.23, 587.33])">Song of Storms</button>
+    <button onclick="playSong([349.23, 587.33, 493.88, 349.23, 587.33, 493.88])">Epona's Song</button>
+    <button onclick="playSong([440.00, 293.66, 440.00, 293.66, 349.23, 293.66])">Saria's Song</button>
+    <button onclick="playSong([587.33, 493.88, 440.00, 349.23, 440.00, 349.23])">Sun's Song</button>
+  </div>
+
+  <script>
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    function playNote(freq, startTime, duration) {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      
+      osc.type = 'sine'; // Clean sine wave for easy pitch detection
+      osc.frequency.setValueAtTime(freq, startTime);
+      
+      gain.gain.setValueAtTime(0.3, startTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
+      
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      
+      osc.start(startTime);
+      osc.stop(startTime + duration);
+    }
+
+    function playSong(notes) {
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+      const noteDuration = 0.4;
+      const now = audioCtx.currentTime;
+      notes.forEach((freq, index) => {
+        playNote(freq, now + (index * noteDuration), noteDuration);
+      });
+    }
+  </script>
+</body>
+</html>
+
